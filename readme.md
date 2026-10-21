@@ -75,8 +75,7 @@ corresponding pre-activation value.
 
 ### 3. Output-Layer Delta
 
-For a sigmoid output neuron using a squared-error loss, an output error
-can be written as:
+For a sigmoid output neuron using a squared-error loss, the output error is:
 
 $$
 \text{output\_error} = a_{\text{output}} - y
@@ -85,8 +84,7 @@ $$
 The output-layer delta is then:
 
 $$
-\delta_{\text{output}} =
-\text{output\_error}\cdot\sigma'(z_{\text{output}})
+\delta_{\text{output}} = \text{output\_error}\cdot\sigma'(z_{\text{output}})
 $$
 
 The exact delta depends on the loss function. For sigmoid activation
