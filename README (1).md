@@ -75,16 +75,18 @@ corresponding pre-activation value.
 
 ### 3. Output-Layer Delta
 
-For a sigmoid output neuron using a squared-error loss, the output error is:
+For a sigmoid output neuron using a squared-error loss, an output error
+can be written as:
 
 $$
-\text{output\_error} = a_{\text{output}} - y
+e_{\mathrm{out}} = a_{\mathrm{out}} - y
 $$
 
 The output-layer delta is then:
 
 $$
-\delta_{\text{output}} = \text{output\_error}\cdot\sigma'(z_{\text{output}})
+\delta_{\mathrm{out}} =
+e_{\mathrm{out}}\cdot\sigma'(z_{\mathrm{out}})
 $$
 
 The exact delta depends on the loss function. For sigmoid activation
@@ -98,15 +100,15 @@ For a batch containing (m) examples, the gradient for the
 hidden-to-output weights is:
 
 $$
-\nabla W_{\text{hidden,output}} =
-\frac{A_{\text{hidden}}^T\delta_{\text{output}}}{m}
+\nabla W_{\mathrm{hidden,out}} =
+\frac{A_{\mathrm{hidden}}^T\delta_{\mathrm{out}}}{m}
 $$
 
 The gradient for the input-to-hidden weights is:
 
 $$
-\nabla W_{\text{input,hidden}} =
-\frac{X^T\delta_{\text{hidden}}}{m}
+\nabla W_{\mathrm{input,hidden}} =
+\frac{X^T\delta_{\mathrm{hidden}}}{m}
 $$
 
 The weights are updated using gradient descent:
