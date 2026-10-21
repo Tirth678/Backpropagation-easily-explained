@@ -1,115 +1,136 @@
 # Understanding Backpropagation in Neural Networks
 
-A beginner-friendly explanation of backpropagation, the chain rule, gradient computation, and weight updates in artificial neural networks.
+A beginner-friendly guide to understanding backpropagation, the chain
+rule, gradient computation, and weight updates in artificial neural
+networks.
 
 ## Overview
 
-Backpropagation is a fundamental algorithm used to train neural networks. It calculates how much each weight and bias contributes to the overall prediction error by propagating gradients backward through the network.
+Backpropagation is an algorithm used to train neural networks. It
+computes how the loss changes with respect to the network's weights and
+biases by propagating gradients backward from the output layer toward
+the input layer.
 
-This repository documents the mathematical foundations of backpropagation, breaking down the process into understandable steps with equations and explanations.
+This repository explains the mathematics step by step and includes a
+Python implementation of backpropagation for a neural network with one
+hidden layer.
+
+## Learn Along With the Video Series
+
+New to backpropagation or neural networks? Watch the accompanying video
+playlist for explanations that complement the equations and code in this
+repository.
+
+**[Watch the Backpropagation & Neural Networks Playlist on
+YouTube](https://www.youtube.com/playlist?list=PLPx5hA5usyrk)**
 
 ## What You'll Learn
 
-- Forward propagation and weighted sums
-- Activation functions and their derivatives
-- Loss functions and output error
-- The chain rule and computational graphs
-- Gradient calculation for weights and biases
-- Error propagation through hidden layers
-- Gradient descent and parameter updates
-- Matrix operations for batch training
+-   Forward propagation and weighted sums
+-   Activation functions and their derivatives
+-   The chain rule
+-   Output-layer and hidden-layer error signals
+-   Weight and bias gradients
+-   Matrix operations for batch training
+-   Gradient descent and parameter updates
 
 ## Mathematical Foundations
 
 ### 1. Forward Propagation
 
-For an input matrix \(X\) and weight matrix \(W\), the pre-activation values are:
+For an input matrix (X) and a weight matrix (W), the pre-activation
+values are:
 
-\[
+$$
 Z = XW
-\]
+$$
 
 Where:
 
-- \(X\) represents the input examples.
-- \(W\) represents the learnable weights.
-- \(Z\) represents the pre-activation values.
+-   \(X\) represents the input examples.
+-   \(W\) represents the learnable weights.
+-   \(Z\) represents the pre-activation values.
 
 For a batch of examples:
 
-\[
-X_{(m \times n)}W_{(n \times h)}
-=
-Z_{(m \times h)}
-\]
+$$
+X_{(m \times n)} W_{(n \times h)} = Z_{(m \times h)}
+$$
 
-Here, \(m\) is the number of examples, \(n\) is the number of input features, and \(h\) is the number of neurons.
+Here, (m) is the number of examples, (n) is the number of input
+features, and (h) is the number of neurons. The dimensions align because
+the number of columns in (X) equals the number of rows in (W).
 
 ### 2. The Chain Rule
 
-Backpropagation relies on the chain rule to compute derivatives through successive operations:
+Backpropagation uses the chain rule to calculate derivatives through
+successive operations:
 
-\[
-\frac{dL}{dz}
-=
-\frac{dL}{da}
-\cdot
-\frac{da}{dz}
-\]
+$$
+\frac{dL}{dz} = \frac{dL}{da}\cdot\frac{da}{dz}
+$$
 
-Where \(L\) is the loss, \(a\) is the activation, and \(z\) is the pre-activation value.
+Here, (L) is the loss, (a) is an activation, and (z) is the
+corresponding pre-activation value.
 
-### 3. Output Layer Delta
+### 3. Output-Layer Delta
 
-For a sigmoid output neuron with an appropriate differentiable loss:
+For a sigmoid output neuron using a squared-error loss, an output error
+can be written as:
 
-\[
-\delta_{\text{output}}
-=
-\text{output\_error}
-\cdot
-\sigma'(z_{\text{output}})
-\]
+$$
+\text{output\_error} = a_{\text{output}} - y
+$$
 
-For example, with squared-error loss:
+The output-layer delta is then:
 
-\[
-\text{output\_error}=a_{\text{output}}-y
-\]
+$$
+\delta_{\text{output}} =
+\text{output\_error}\cdot\sigma'(z_{\text{output}})
+$$
 
-The exact delta formula depends on the loss function being used.
+The exact delta depends on the loss function. For sigmoid activation
+with binary cross-entropy loss, the output delta typically simplifies to
+(a\_{`\text{output}`{=tex}} - y), without multiplying by the sigmoid
+derivative again.
 
 ### 4. Weight Gradients
 
-For a batch of \(m\) examples, the gradient for the hidden-to-output weights can be written as:
+For a batch containing (m) examples, the gradient for the
+hidden-to-output weights is:
 
-\[
-\nabla W_{\text{hidden,output}}
-=
-\frac{A_{\text{hidden}}^T
-\delta_{\text{output}}}{m}
-\]
+$$
+\nabla W_{\text{hidden,output}} =
+\frac{A_{\text{hidden}}^T\delta_{\text{output}}}{m}
+$$
 
-The weights are then updated using gradient descent:
+The gradient for the input-to-hidden weights is:
 
-\[
-W \leftarrow W-\eta\nabla W
-\]
+$$
+\nabla W_{\text{input,hidden}} =
+\frac{X^T\delta_{\text{hidden}}}{m}
+$$
 
-Where \(\eta\) is the learning rate.
+The weights are updated using gradient descent:
+
+$$
+W \leftarrow W - \eta\nabla W
+$$
+
+Here, (`\eta`{=tex}) is the learning rate, (T) denotes matrix transpose,
+and the delta terms contain the layer-wise error signals.
 
 ## Backpropagation Implementation
 
-The following function implements backpropagation for a neural network with one hidden layer and a sigmoid activation function.
+The function below computes gradients and updates the weights and biases
+for a neural network with one hidden layer. It assumes that the weights,
+biases, NumPy import, and `sigmoid_derivative()` function have already
+been defined.
 
-It calculates the output error, propagates gradients backward through the hidden layer, computes weight and bias gradients, and updates the parameters using gradient descent.
-
-### Code
-
-```python
+``` python
 def backward(X, y, z_hidden, a_hidden, z_output, a_output, learning_rate):
     """
-    Compute gradients and update the weights and biases using backpropagation.
+    Compute gradients and update weights and biases using backpropagation.
     """
     global weights_input_hidden, bias_hidden
     global weights_hidden_output, bias_output
@@ -117,25 +138,23 @@ def backward(X, y, z_hidden, a_hidden, z_output, a_output, learning_rate):
     # Number of training examples
     m = X.shape[0]
 
-    # 1. Output layer error
+    # 1. Calculate the output error
     output_error = a_output - y
 
-    # 2. Output layer delta
-    # Combine the output error with the sigmoid derivative
+    # 2. Calculate the output-layer delta
     output_delta = output_error * sigmoid_derivative(z_output)
 
-    # 3. Gradients for hidden-to-output weights and output bias
+    # 3. Calculate gradients for hidden-to-output weights and output bias
     grad_weights_hidden_output = np.dot(a_hidden.T, output_delta) / m
     grad_bias_output = np.mean(output_delta, axis=0, keepdims=True)
 
     # 4. Propagate the error backward to the hidden layer
     hidden_error = np.dot(output_delta, weights_hidden_output.T)
 
-    # 5. Hidden layer delta
-    # Scale the propagated error by the hidden neurons' derivatives
+    # 5. Calculate the hidden-layer delta
     hidden_delta = hidden_error * sigmoid_derivative(z_hidden)
 
-    # 6. Gradients for input-to-hidden weights and hidden bias
+    # 6. Calculate gradients for input-to-hidden weights and hidden bias
     grad_weights_input_hidden = np.dot(X.T, hidden_delta) / m
     grad_bias_hidden = np.mean(hidden_delta, axis=0, keepdims=True)
 
@@ -147,106 +166,66 @@ def backward(X, y, z_hidden, a_hidden, z_output, a_output, learning_rate):
     bias_hidden -= learning_rate * grad_bias_hidden
 ```
 
-### How It Works
+### How the Code Works
 
-1. **Calculate the output error:** Compare the predicted output with the target values.
-2. **Calculate the output delta:** Multiply the output error by the derivative of the sigmoid activation function.
-3. **Compute output-layer gradients:** Calculate the gradients for the hidden-to-output weights and output bias.
-4. **Propagate the error:** Use the transpose of the hidden-to-output weight matrix to distribute the error backward.
-5. **Calculate the hidden delta:** Multiply the propagated error by the sigmoid derivative of the hidden layer.
-6. **Compute hidden-layer gradients:** Calculate gradients for the input-to-hidden weights and hidden bias.
-7. **Update parameters:** Adjust all weights and biases in the direction that reduces the loss.
+1.  **Calculate the output error:** Compare the predicted output with
+    the target value.
+2.  **Calculate the output delta:** Scale the output error by the
+    derivative of the sigmoid activation.
+3.  **Compute output-layer gradients:** Use the hidden-layer activations
+    and output delta to calculate weight and bias gradients.
+4.  **Propagate the error backward:** Multiply the output delta by the
+    transpose of the hidden-to-output weight matrix.
+5.  **Calculate the hidden delta:** Scale the propagated error by the
+    derivative of the hidden-layer sigmoid activation.
+6.  **Compute hidden-layer gradients:** Use the input matrix and hidden
+    delta to calculate weight and bias gradients.
+7.  **Update parameters:** Apply gradient descent to the weights and
+    biases.
 
-### Key Equations
+### Notes About the Implementation
 
-**Output layer delta**
-
-\[
-\delta_{\text{output}}
-=
-(a_{\text{output}}-y)\odot\sigma'(z_{\text{output}})
-\]
-
-**Hidden layer delta**
-
-\[
-\delta_{\text{hidden}}
-=
-(\delta_{\text{output}}W_{\text{hidden,output}}^T)
-\odot\sigma'(z_{\text{hidden}})
-\]
-
-**Weight gradients**
-
-\[
-\nabla W_{\text{hidden,output}}
-=
-\frac{A_{\text{hidden}}^T\delta_{\text{output}}}{m}
-\]
-
-\[
-\nabla W_{\text{input,hidden}}
-=
-\frac{X^T\delta_{\text{hidden}}}{m}
-\]
-
-**Gradient descent update**
-
-\[
-W\leftarrow W-\eta\nabla W
-\]
-
-Here, \(\odot\) denotes element-wise multiplication, \(m\) is the number of training examples, and \(\eta\) is the learning rate.
-
-### Assumptions
-
-- The network contains one hidden layer and one output layer.
-- Both layers use sigmoid activation functions.
-- The implementation assumes a batch-compatible array layout.
-- The output error `a_output - y` is consistent with the gradient of mean squared error up to a constant factor, depending on the loss definition. The code should use a matching loss function and gradient convention.
-- The required weights, biases, NumPy import, and `sigmoid_derivative()` function must be defined elsewhere in the project.
-
-## Repository Contents
-
-- **Paper:** A step-by-step explanation of backpropagation.
-- **Equations:** Mathematical derivations of gradients and weight updates.
-- **Examples:** Illustrations of the calculations involved in neural network training.
-
-The contents may expand as the paper and supporting examples evolve.
+-   The code uses NumPy-style matrix operations and expects
+    batch-compatible array shapes.
+-   The division by (m) averages the weight gradients across the
+    training batch.
+-   The bias gradients are averaged across examples using `np.mean`.
+-   The output delta shown in the code is appropriate for a sigmoid
+    output with a squared-error-style loss convention. Ensure your
+    training loss and derivative conventions match.
+-   The weights and biases are updated in place, so they must be
+    initialized before calling `backward()`.
 
 ## Who Is This For?
 
-This resource is intended for:
+This repository is intended for:
 
-- Students learning artificial neural networks.
-- Beginners exploring machine learning mathematics.
-- Developers implementing neural networks from scratch.
-- Anyone seeking an intuitive understanding of gradient-based learning.
+-   Students learning artificial neural networks.
+-   Beginners exploring the mathematics behind machine learning.
+-   Developers implementing neural networks from scratch.
+-   Learners who want to connect mathematical equations to Python code.
 
-Basic familiarity with derivatives, matrices, and neural network terminology is helpful.
+Basic familiarity with derivatives, matrices, and neural network
+terminology is helpful.
 
 ## Scope
 
-This is an educational resource explaining established backpropagation concepts. It is not intended to introduce a novel training algorithm or claim new research findings.
+This is an educational explanation of established backpropagation
+concepts. It does not claim to introduce a new algorithm or novel
+research finding.
 
 ## Contributing
 
-Suggestions, corrections, and improvements are welcome. If you find a mathematical error or have an idea that could make an explanation clearer, feel free to open an issue or submit a pull request.
+Suggestions, corrections, and improvements are welcome. If you find a
+mathematical error or have an idea that could make an explanation
+clearer, feel free to open an issue or submit a pull request.
 
 ## License
 
-Unless otherwise specified, the repository's content is provided for educational purposes. A formal reuse license can be added when the repository owner selects one.
+A license has not yet been specified. Add a license file if you want to
+clearly define how others may reuse or distribute this repository's
+content.
 
-## Learn Along With the Video Series
-
-New to backpropagation or neural networks? Check out the accompanying YouTube playlist for video explanations that complement this repository.
-
-**[Watch the Backpropagation & Neural Networks Playlist on YouTube](https://www.youtube.com/playlist?list=PLPx5hA5usyrk)**
-
-The playlist is a great starting point if you'd prefer to understand the concepts visually before diving into the mathematical derivations and Python implementation in this repository.
-
----
+------------------------------------------------------------------------
 
 **Author:** Tirth S. Pandya
-
-If you find this resource useful, consider starring the repository and sharing it with other learners.
